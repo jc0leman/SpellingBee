@@ -38,20 +38,78 @@ public class SpellingBee {
     public SpellingBee(String letters) {
         this.letters = letters;
         words = new ArrayList<String>();
+
     }
 
     // TODO: generate all possible substrings and permutations of the letters.
     //  Store them all in the ArrayList words. Do this by calling ANOTHER method
     //  that will find the substrings recursively.
     public void generate() {
+
+         String changeLetters = letters;
+         //find a way to remove null indexes later
+       for(int i = 1; i <= changeLetters.length(); i++)
+        genRecursion("", changeLetters, i);
         // YOUR CODE HERE — Call your recursive method!
+    }
+    public void genRecursion(String beginFront,  String changeLetters, int length)
+    {
+        if(length == 0) {
+            words.add(beginFront);
+        }
+        else
+        {
+            for(int i = 0; i < changeLetters.length(); i++)
+            {
+                genRecursion(beginFront + changeLetters.charAt(i), changeLetters.substring(0, i) +
+                        changeLetters.substring(i + 1), length - 1);
+            }
+        }
+        return;
+
+
+    }
+    public void rmvFirstIndex(ArrayList<String> combos, String changeLetters)
+    {
+        combos.add(changeLetters.substring(0, changeLetters.length() - 1));
     }
 
     // TODO: Apply mergesort to sort all words. Do this by calling ANOTHER method
     //  that will find the substrings recursively.
     public void sort() {
-        // YOUR CODE HERE
+        mSort(words);
+
     }
+
+        public void mSort(ArrayList<String> words){
+
+        if (words.size() > 1) {
+            int mid = words.size() / 2;
+            ArrayList<String> leftHalf = new ArrayList<String>(words.subList(0, mid));
+            ArrayList<String> rightHalf = new ArrayList<String>(words.subList(mid, words.size()));
+
+            mSort(leftHalf);
+            mSort(rightHalf);
+
+            int i = 0, j = 0, k = 0;
+            while (i < leftHalf.size() && j < rightHalf.size()) {
+                if (leftHalf.get(i).compareTo(rightHalf.get(j)) < 0) {
+                    words.set(k++, leftHalf.get(i++));
+                } else {
+                    words.set(k++, rightHalf.get(j++));
+                }
+            }
+
+            while (i < leftHalf.size()) {
+                words.set(k++, leftHalf.get(i++));
+            }
+
+            while (j < rightHalf.size()) {
+                words.set(k++, rightHalf.get(j++));
+            }
+        }
+    }
+
 
     // Removes duplicates from the sorted list.
     public void removeDuplicates() {
@@ -63,13 +121,46 @@ public class SpellingBee {
             else
                 i++;
         }
+
     }
 
     // TODO: For each word in words, use binary search to see if it is in the dictionary.
     //  If it is not in the dictionary, remove it from words.
     public void checkWords() {
+
+        ArrayList<String> newWords = new ArrayList<>();
+        for (int i = 0; i < words.size(); i++)
+        {
+         if(biSearch(words.get(i))) {
+             newWords.add(words.get(i));
+         }
+
+        }
+        System.out.println(newWords);
         // YOUR CODE HERE
     }
+    public boolean biSearch(String a) {
+        int end = DICTIONARY_SIZE;
+        int begin = 0;
+        while (end >= begin)
+        {
+            int mid = (end + begin) / 2;
+            if (DICTIONARY[mid].equals(a))
+            {
+                return true;
+            }
+        else if(DICTIONARY[mid].compareTo(a) > 0)
+            {
+                end = mid - 1;
+            }
+        else
+            {
+                begin = mid + 1;
+            }
+        }
+    return false;
+    }
+
 
     // Prints all valid words to wordList.txt
     public void printWords() throws IOException {
@@ -129,6 +220,7 @@ public class SpellingBee {
         sb.sort();
         sb.removeDuplicates();
         sb.checkWords();
+        System.out.println();
         try {
             sb.printWords();
         } catch (IOException e) {
@@ -136,4 +228,6 @@ public class SpellingBee {
         }
         s.close();
     }
+
+
 }
